@@ -4,15 +4,23 @@ namespace Assessment {
     class Program {
         static void Main(string[] args)
         {
+            // string [,] grid = {
+            //     {"1","1","1","1","0"},
+            //     {"1","1","0","1","0"},
+            //     {"1","1","0","0","0"},
+            //     {"0","0","0","0","0"}
+            // };
+
             string [,] grid = {
-                {"1","1","0","1","1"},
-                {"1","1","0","0","1"},
-                {"1","0","1","0","0"},
+                {"1","1","0","0","0"},
+                {"1","1","0","0","0"},
+                {"0","0","1","0","0"},
                 {"0","0","0","1","1"}
             };
+
             // string[, ] grid = setupGrid();
             Print2DArray(grid);
-            Console.WriteLine(NoOfIsland(grid));
+            Console.WriteLine("Number of Islands: " + NoOfIsland(grid));
         }
 
         public static string[,] setupGrid()
@@ -93,114 +101,73 @@ namespace Assessment {
             int output = 0;
             int m = grid.GetLength(0);
             int n = grid.GetLength(1);
-            output += FindSingleLandIslands(grid);
-            output += FindMultiLandsIslands(grid);
+            List <int[]> checkedLocationsArray = new List <int[]> ();
 
-            return output;
-        }
-
-            public static int FindSingleLandIslands(string[,] grid)
+            for (int i = 0; i < m; i++)
             {
-                int m = grid.GetLength(0);
-                int n = grid.GetLength(1);
-                int result = 0;
-
-                for (var i = 0; i < m; i++)
+                for (int j = 0; j < n; j++)
                 {
-                    for (var j = 0; j < n; j++)
+                    if (grid[i,j] == "1")
                     {
-                        if (grid[i,j] == "1")
+                        int[] location = new int[] { i, j };
+                        // see if the location was checked before:
+                        bool isLocationChecked = CheckLocation(location, checkedLocationsArray);
+                        // add location to checkedLocationsArray if not checked before:
+                        if (!isLocationChecked)
                         {
-                            // count the number of water locations around a land location
-                            int noOfWaterLocations = 0;
+                            checkedLocationsArray.Add(location);
+                            checkedLocationsArray = FindLandsAround(m, n, location, checkedLocationsArray, grid);
+                            output += 1;
 
-                            // first row
-                            if (i == 0)
-                            {
-                                noOfWaterLocations += 1;
-                                if (grid[i+1, j] == "0")
-                                {
-                                    noOfWaterLocations += 1;
-                                }
-                            }
-                            // last row
-                            else if (i == m - 1)
-                            {
-                                noOfWaterLocations += 1;
-                                if (grid[i-1,j] == "0")
-                                {
-                                    noOfWaterLocations += 1;
-                                }
-                            }
-                            // other rows
-                            else
-                            {
-                                if (grid[i+1,j] == "0")
-                                {
-                                    noOfWaterLocations += 1;
-                                }
-                                if (grid[i-1,j] == "0")
-                                {
-                                    noOfWaterLocations += 1;
-                                }
-                            }
-
-                            // first column
-                            if (j == 0)
-                            {
-                                noOfWaterLocations += 1;
-                                if (grid[i, j+1] == "0")
-                                {
-                                    noOfWaterLocations += 1;
-                                }
-                            }
-                            // last column
-                            else if (j == n - 1)
-                            {
-                                noOfWaterLocations += 1;
-                                if (grid[i, j-1] == "0")
-                                {
-                                    noOfWaterLocations += 1;
-                                }
-                            }
-                            // other columns
-                            else
-                            {
-                                if (grid[i,j+1] == "0")
-                                {
-                                    noOfWaterLocations += 1;
-                                }
-                                if (grid[i,j-1] == "0")
-                                {
-                                    noOfWaterLocations += 1;
-                                }
-                            }
-
-                            // check if the current item is an island location:
-                            if (noOfWaterLocations == 4)
-                            {
-                                result += 1;
-                            }
                         }
                     }
                 }
-                return result;
             }
+            // foreach (var res in checkedLocationsArray)
+            // {
+            //     Console.WriteLine(string.Join(",", res));
+            // }
+            return output;
+        }
 
-            public static int FindMultiLandsIslands(string[,] grid)
+        public static List <int[]> FindLandsAround(int m, int n, int[] location, List <int[]> checkedLocationsArray, string[,] grid)
         {
-            int m = grid.GetLength(0);
-            int n = grid.GetLength(1);
-            int result = 0;
-
-            for (var i = 0; i < m; i++)
+            int[,] neighbors = CreateNeighboursList(location);
+            for(int k = 0; k < neighbors.GetLength(0); k++)
             {
-                for (var j = 0; j < n; j++)
+                int[] neighbor = { neighbors[k,0], neighbors[k,1] };
+                int i = neighbor[0];
+                int j = neighbor[1];
+                if((i >= 0 && i < m) && (j >= 0 && j < n))
                 {
+                    if ((grid[i,j] == "1") && !CheckLocation(neighbor, checkedLocationsArray))
+                    {
+                        // add location to checkedLocationsArray if not checked before:
+                        checkedLocationsArray.Add(neighbor);
+                        FindLandsAround(m, n, neighbor, checkedLocationsArray, grid);
+                    }
                 }
             }
+            return checkedLocationsArray;
+        }
 
-            return result;
+        public static bool CheckLocation(int[] location, List <int[]> checkedLocations)
+        {
+            bool isChecked = checkedLocations.Any(item => (item[0] == location[0] && item[1] == location[1]));
+            return isChecked;
+        }
+
+        public static int[,] CreateNeighboursList(int[] location)
+        {
+            int i = location[0];
+            int j = location[1];
+            int[,] neighboursList = new int[,] {
+                {i, j+1},
+                {i, j-1},
+                {i+1, j},
+                {i-1, j},
+            };
+            return neighboursList;
         }
     }
 }
