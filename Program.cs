@@ -4,12 +4,18 @@ namespace Assessment {
     class Program {
         static void Main(string[] args)
         {
-            int[, ] grid = setupGrid();
+            string [,] grid = {
+                {"1","1","0","1","1"},
+                {"1","1","0","0","1"},
+                {"1","0","1","0","0"},
+                {"0","0","0","1","1"}
+            };
+            // string[, ] grid = setupGrid();
             Print2DArray(grid);
             Console.WriteLine(NoOfIsland(grid));
         }
 
-        public static int[, ] setupGrid()
+        public static string[,] setupGrid()
         {
             int m = 0;
             int n = 0;
@@ -50,20 +56,20 @@ namespace Assessment {
 
             Console.WriteLine("It's time to pass your grid to the app. Enter '0' for a water location and '1' for a land location. Any other characters will be considered as a land!");
 
-            int[, ] grid = new int[m,n];
+            string[,] grid = new string[m,n];
             for (var i = 0; i < m; i++)
             {
                 for (var j = 0; j < n; j++)
                 {
                     Console.WriteLine($"Enter the location code for item in row number {i} and column number {j}:");
-                    int location = Convert.ToInt32(Console.ReadLine());
-                    if (location == 0)
+                    string? location = Console.ReadLine();
+                    if (location == "0")
                     {
-                        grid[i, j] = location;
+                        grid[i,j] = location;
                     }
                     else
                     {
-                        grid[i, j] = 1;
+                        grid[i,j] = "1";
                     }
                 }
             }
@@ -82,102 +88,106 @@ namespace Assessment {
             }
         }
 
-        public static int NoOfIsland(int[, ] grid)
+        public static int NoOfIsland(string[,] grid)
         {
             int output = 0;
             int m = grid.GetLength(0);
             int n = grid.GetLength(1);
             output += FindSingleLandIslands(grid);
             output += FindMultiLandsIslands(grid);
+
             return output;
         }
 
-        public static int FindSingleLandIslands(int[, ] grid)
-        {
-            int m = grid.GetLength(0);
-            int n = grid.GetLength(1);
-            int result = 0;
-
-            for (var i = 0; i < m; i++)
+            public static int FindSingleLandIslands(string[,] grid)
             {
-                for (var j = 0; j < n; j++)
+                int m = grid.GetLength(0);
+                int n = grid.GetLength(1);
+                int result = 0;
+
+                for (var i = 0; i < m; i++)
                 {
-                    // count the number of water locations around a land location
-                    int noOfWaterLocations = 0;
+                    for (var j = 0; j < n; j++)
+                    {
+                        if (grid[i,j] == "1")
+                        {
+                            // count the number of water locations around a land location
+                            int noOfWaterLocations = 0;
 
-                    // first row
-                    if (i == 0)
-                    {
-                        noOfWaterLocations += 1;
-                        if (grid[i+1, j] == 0)
-                        {
-                            noOfWaterLocations += 1;
-                        }
-                    }
-                    // last row
-                    else if (i == m)
-                    {
-                        noOfWaterLocations += 1;
-                        if (grid[i-1, j] == 0)
-                        {
-                            noOfWaterLocations += 1;
-                        }
-                    }
-                    // other rows
-                    else
-                    {
-                        if (grid[i+1, j] == 0)
-                        {
-                            noOfWaterLocations += 1;
-                        }
-                        if (grid[i-1, j] == 0)
-                        {
-                            noOfWaterLocations += 1;
-                        }
-                    }
+                            // first row
+                            if (i == 0)
+                            {
+                                noOfWaterLocations += 1;
+                                if (grid[i+1, j] == "0")
+                                {
+                                    noOfWaterLocations += 1;
+                                }
+                            }
+                            // last row
+                            else if (i == m - 1)
+                            {
+                                noOfWaterLocations += 1;
+                                if (grid[i-1,j] == "0")
+                                {
+                                    noOfWaterLocations += 1;
+                                }
+                            }
+                            // other rows
+                            else
+                            {
+                                if (grid[i+1,j] == "0")
+                                {
+                                    noOfWaterLocations += 1;
+                                }
+                                if (grid[i-1,j] == "0")
+                                {
+                                    noOfWaterLocations += 1;
+                                }
+                            }
 
-                    // first column
-                    if (j == 0)
-                    {
-                        noOfWaterLocations += 1;
-                        if (grid[i, j+1] == 0)
-                        {
-                            noOfWaterLocations += 1;
-                        }
-                    }
-                    // last column
-                    else if (j == n)
-                    {
-                        noOfWaterLocations += 1;
-                        if (grid[i, j-1] == 0)
-                        {
-                            noOfWaterLocations += 1;
-                        }
-                    }
-                    // other columns
-                    else
-                    {
-                        if (grid[i, j+1] == 0)
-                        {
-                            noOfWaterLocations += 1;
-                        }
-                        if (grid[i, j-1] == 0)
-                        {
-                            noOfWaterLocations += 1;
-                        }
-                    }
+                            // first column
+                            if (j == 0)
+                            {
+                                noOfWaterLocations += 1;
+                                if (grid[i, j+1] == "0")
+                                {
+                                    noOfWaterLocations += 1;
+                                }
+                            }
+                            // last column
+                            else if (j == n - 1)
+                            {
+                                noOfWaterLocations += 1;
+                                if (grid[i, j-1] == "0")
+                                {
+                                    noOfWaterLocations += 1;
+                                }
+                            }
+                            // other columns
+                            else
+                            {
+                                if (grid[i,j+1] == "0")
+                                {
+                                    noOfWaterLocations += 1;
+                                }
+                                if (grid[i,j-1] == "0")
+                                {
+                                    noOfWaterLocations += 1;
+                                }
+                            }
 
-                    // check if the current item is an island location:
-                    if (noOfWaterLocations == 4)
-                    {
-                        result += 1;
+                            // check if the current item is an island location:
+                            if (noOfWaterLocations == 4)
+                            {
+                                result += 1;
+                            }
+                        }
                     }
                 }
+                return result;
             }
-            return result;
-        }
 
-        public static int FindMultiLandsIslands(int[, ] grid)
+            public static int FindMultiLandsIslands(string[,] grid)
         {
             int m = grid.GetLength(0);
             int n = grid.GetLength(1);
